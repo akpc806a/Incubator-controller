@@ -11002,7 +11002,7 @@ type RDH, grid 15 mm</description>
 <part name="T1" library="triac" deviceset="BT138" device="-V"/>
 <part name="F1" library="fuse" deviceset="FUSE" device="BLANK_5X20MM"/>
 <part name="OK1" library="optocoupler" deviceset="MOC30*M" device="" technology="20"/>
-<part name="R1" library="rcl" deviceset="R-EU_" device="0207/2V" value="390"/>
+<part name="R1" library="rcl" deviceset="R-EU_" device="0204/7" value="390"/>
 <part name="R2" library="rcl" deviceset="R-EU_" device="R0805" value="330"/>
 <part name="X2" library="con-phoenix-508" deviceset="MKDSN1,5/2-5,08" device=""/>
 <part name="X3" library="con-phoenix-508" deviceset="MKDSN1,5/2-5,08" device=""/>
@@ -11019,11 +11019,11 @@ type RDH, grid 15 mm</description>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="R6" library="rcl" deviceset="R-EU_" device="R0805" value="1 k [NP]"/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="0309/V" value="68 k"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="0204/7" value="68 k"/>
 <part name="X4" library="con-molex" deviceset="22-23-2021" device=""/>
 <part name="OK4" library="optocoupler" deviceset="MOC30*M" device="" technology="20"/>
 <part name="T2" library="triac" deviceset="BT138" device="-V"/>
-<part name="R8" library="rcl" deviceset="R-EU_" device="0207/2V" value="390"/>
+<part name="R8" library="rcl" deviceset="R-EU_" device="0204/7" value="390"/>
 <part name="R9" library="rcl" deviceset="R-EU_" device="R0805" value="330"/>
 <part name="X5" library="con-phoenix-508" deviceset="MKDSN1,5/2-5,08" device=""/>
 <part name="C1" library="rcl" deviceset="C-EU" device="C0805" value="0.1"/>

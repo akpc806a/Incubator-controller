@@ -1257,18 +1257,33 @@ for trimmer refence see : &lt;u&gt;www.electrospec-inc.com/cross_references/trim
 &lt;/tr&gt;
 &lt;/table&gt;</description>
 <packages>
-<package name="0207/2V">
+<package name="0204/7">
 <description>&lt;b&gt;RESISTOR&lt;/b&gt;&lt;p&gt;
-type 0207, grid 2.5 mm</description>
-<wire x1="-1.27" y1="0" x2="-0.381" y2="0" width="0.6096" layer="51"/>
-<wire x1="-0.254" y1="0" x2="0.254" y2="0" width="0.6096" layer="21"/>
-<wire x1="0.381" y1="0" x2="1.27" y2="0" width="0.6096" layer="51"/>
-<circle x="-1.27" y="0" radius="1.27" width="0.1524" layer="21"/>
-<circle x="-1.27" y="0" radius="1.016" width="0.1524" layer="51"/>
-<pad name="1" x="-1.27" y="0" drill="0.8128" shape="octagon"/>
-<pad name="2" x="1.27" y="0" drill="0.8128" shape="octagon"/>
-<text x="-0.0508" y="1.016" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<text x="-0.0508" y="-2.2352" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
+type 0204, grid 7.5 mm</description>
+<wire x1="3.81" y1="0" x2="2.921" y2="0" width="0.508" layer="51"/>
+<wire x1="-3.81" y1="0" x2="-2.921" y2="0" width="0.508" layer="51"/>
+<wire x1="-2.54" y1="0.762" x2="-2.286" y2="1.016" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-2.54" y1="-0.762" x2="-2.286" y2="-1.016" width="0.1524" layer="21" curve="90"/>
+<wire x1="2.286" y1="-1.016" x2="2.54" y2="-0.762" width="0.1524" layer="21" curve="90"/>
+<wire x1="2.286" y1="1.016" x2="2.54" y2="0.762" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-2.54" y1="-0.762" x2="-2.54" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="-2.286" y1="1.016" x2="-1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="-1.778" y1="0.889" x2="-1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="-2.286" y1="-1.016" x2="-1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="-1.778" y1="-0.889" x2="-1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="1.778" y1="0.889" x2="1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="1.778" y1="0.889" x2="-1.778" y2="0.889" width="0.1524" layer="21"/>
+<wire x1="1.778" y1="-0.889" x2="1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="1.778" y1="-0.889" x2="-1.778" y2="-0.889" width="0.1524" layer="21"/>
+<wire x1="2.286" y1="1.016" x2="1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="2.286" y1="-1.016" x2="1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="2.54" y1="-0.762" x2="2.54" y2="0.762" width="0.1524" layer="21"/>
+<pad name="1" x="-3.81" y="0" drill="0.8128" shape="octagon"/>
+<pad name="2" x="3.81" y="0" drill="0.8128" shape="octagon"/>
+<text x="-2.54" y="1.2954" size="0.9906" layer="25" ratio="10">&gt;NAME</text>
+<text x="-1.6256" y="-0.4826" size="0.9906" layer="27" ratio="10">&gt;VALUE</text>
+<rectangle x1="2.54" y1="-0.254" x2="2.921" y2="0.254" layer="21"/>
+<rectangle x1="-2.921" y1="-0.254" x2="-2.54" y2="0.254" layer="21"/>
 </package>
 <package name="R0805">
 <description>&lt;b&gt;RESISTOR&lt;/b&gt;&lt;p&gt;</description>
@@ -2484,21 +2499,6 @@ type 0204, grid 7.5 mm</description>
 <rectangle x1="2.54" y1="-0.254" x2="2.921" y2="0.254" layer="21"/>
 <rectangle x1="-2.921" y1="-0.254" x2="-2.54" y2="0.254" layer="21"/>
 </package>
-<package name="0309V">
-<description>&lt;b&gt;RESISTOR&lt;/b&gt;&lt;p&gt;
-type 0309, grid 2.5 mm</description>
-<wire x1="1.27" y1="0" x2="0.635" y2="0" width="0.6096" layer="51"/>
-<wire x1="-0.635" y1="0" x2="-1.27" y2="0" width="0.6096" layer="51"/>
-<circle x="-1.27" y="0" radius="1.524" width="0.1524" layer="21"/>
-<circle x="-1.27" y="0" radius="0.762" width="0.1524" layer="51"/>
-<pad name="1" x="-1.27" y="0" drill="0.8128" shape="octagon"/>
-<pad name="2" x="1.27" y="0" drill="0.8128" shape="octagon"/>
-<text x="0.254" y="1.016" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<text x="0.254" y="-2.2098" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
-<rectangle x1="0.254" y1="-0.3048" x2="0.5588" y2="0.3048" layer="51"/>
-<rectangle x1="-0.635" y1="-0.3048" x2="-0.3302" y2="0.3048" layer="51"/>
-<rectangle x1="-0.3302" y1="-0.3048" x2="0.254" y2="0.3048" layer="21"/>
-</package>
 </packages>
 </library>
 <library name="con-molex">
@@ -2726,7 +2726,7 @@ type 0309, grid 2.5 mm</description>
 <attribute name="MF" value="FAIRCHILD SEMICONDUCTOR" x="38.1" y="-19.05" size="1.778" layer="27" display="off"/>
 <attribute name="OC_FARNELL" value="1505425" x="38.1" y="-19.05" size="1.778" layer="27" display="off"/>
 </element>
-<element name="R1" library="rcl" package="0207/2V" value="390" x="19.05" y="28.575" rot="R90"/>
+<element name="R1" library="rcl" package="0204/7" value="390" x="20.6375" y="31.4325"/>
 <element name="R2" library="rcl" package="R0805" value="330" x="16.51" y="11.43" rot="R90"/>
 <element name="X2" library="con-phoenix-508" package="MKDSN1,5/2-5,08" value="MKDSN1,5/2-5,08" x="12.7" y="45.72">
 <attribute name="OC_NEWARK" value="30M2397" x="33.02" y="40.64" size="1.778" layer="27" display="off"/>
@@ -2762,7 +2762,7 @@ type 0309, grid 2.5 mm</description>
 <attribute name="OC_FARNELL" value="9860150" x="-3.81" y="59.69" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="R6" library="rcl" package="R0805" value="1 k [NP]" x="31.75" y="11.43" rot="R180"/>
-<element name="R7" library="resistor" package="0309V" value="68 k" x="27.94" y="36.83" rot="R90"/>
+<element name="R7" library="resistor" package="0204/7" value="68 k" x="24.13" y="36.5125" rot="R180"/>
 <element name="X4" library="con-molex" package="22-23-2021" value="22-23-2021" x="13.97" y="5.08">
 <attribute name="OC_NEWARK" value="25C3832" x="13.97" y="5.08" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="22-23-2021" x="13.97" y="5.08" size="1.778" layer="27" display="off"/>
@@ -2776,7 +2776,7 @@ type 0309, grid 2.5 mm</description>
 <attribute name="OC_FARNELL" value="1505425" x="5.08" y="13.97" size="1.778" layer="27" display="off"/>
 </element>
 <element name="T2" library="triac" package="TO220BV" value="BT138-V" x="1.27" y="26.3525" rot="R90"/>
-<element name="R8" library="rcl" package="0207/2V" value="390" x="8.89" y="22.86" rot="R90"/>
+<element name="R8" library="rcl" package="0204/7" value="390" x="8.89" y="26.9875" rot="R90"/>
 <element name="R9" library="rcl" package="R0805" value="330" x="8.89" y="5.08" rot="R90"/>
 <element name="X5" library="con-phoenix-508" package="MKDSN1,5/2-5,08" value="MKDSN1,5/2-5,08" x="24.13" y="45.72">
 <attribute name="OC_NEWARK" value="30M2397" x="24.13" y="45.72" size="1.778" layer="27" display="off"/>
@@ -2821,8 +2821,6 @@ type 0309, grid 2.5 mm</description>
 <contactref element="R7" pad="2"/>
 <contactref element="X5" pad="2"/>
 <wire x1="26.67" y1="45.7661" x2="26.6489" y2="45.745" width="1.27" layer="16"/>
-<wire x1="27.94" y1="38.1" x2="27.94" y2="40.005" width="1.27" layer="16"/>
-<wire x1="27.94" y1="40.005" x2="27.94" y2="41.91" width="0" layer="19" extent="1-16"/>
 <wire x1="27.94" y1="40.005" x2="27.94" y2="44.4539" width="2.1844" layer="16"/>
 <wire x1="27.94" y1="44.4539" x2="26.6489" y2="45.745" width="2.1844" layer="16"/>
 <wire x1="29.21" y1="40.005" x2="35.56" y2="33.655" width="2.1844" layer="16"/>
@@ -2830,10 +2828,12 @@ type 0309, grid 2.5 mm</description>
 <contactref element="X2" pad="2"/>
 <wire x1="15.24" y1="45.7661" x2="15.2189" y2="45.745" width="1.27" layer="16"/>
 <wire x1="15.24" y1="45.7661" x2="15.24" y2="44.45" width="2.1844" layer="16"/>
-<wire x1="27.6225" y1="42.2275" x2="27.94" y2="41.91" width="0" layer="19" extent="1-16"/>
 <wire x1="29.21" y1="40.005" x2="27.94" y2="40.005" width="2.1844" layer="16"/>
 <wire x1="15.24" y1="44.45" x2="19.685" y2="40.005" width="2.1844" layer="16"/>
-<wire x1="19.685" y1="40.005" x2="27.94" y2="40.005" width="2.1844" layer="16"/>
+<wire x1="19.685" y1="40.005" x2="20.6375" y2="40.005" width="2.1844" layer="16"/>
+<wire x1="20.6375" y1="40.005" x2="27.94" y2="40.005" width="2.1844" layer="16"/>
+<wire x1="20.32" y1="36.5125" x2="20.32" y2="39.6875" width="1.27" layer="16"/>
+<wire x1="20.32" y1="39.6875" x2="20.6375" y2="40.005" width="0.3048" layer="16"/>
 </signal>
 <signal name="N$8">
 <contactref element="X3" pad="2"/>
@@ -2846,22 +2846,23 @@ type 0309, grid 2.5 mm</description>
 <wire x1="39.37" y1="27.94" x2="33.02" y2="27.94" width="1.27" layer="16"/>
 <wire x1="33.02" y1="27.94" x2="32.385" y2="28.575" width="1.27" layer="16"/>
 <wire x1="32.385" y1="28.575" x2="31.115" y2="29.845" width="1.27" layer="16"/>
-<wire x1="31.115" y1="29.845" x2="22.225" y2="29.845" width="1.27" layer="16"/>
-<wire x1="22.225" y1="29.845" x2="20.6375" y2="31.4325" width="1.27" layer="16"/>
-<wire x1="20.6375" y1="31.4325" x2="15.24" y2="36.83" width="1.27" layer="16"/>
+<wire x1="31.115" y1="29.845" x2="24.4475" y2="29.845" width="1.27" layer="16"/>
+<wire x1="24.4475" y1="29.845" x2="22.225" y2="29.845" width="1.27" layer="16"/>
+<wire x1="22.225" y1="29.845" x2="15.24" y2="36.83" width="1.27" layer="16"/>
 <wire x1="15.24" y1="36.83" x2="8.89" y2="36.83" width="1.27" layer="16"/>
-<wire x1="8.89" y1="24.13" x2="8.89" y2="26.3525" width="1.27" layer="16"/>
-<wire x1="8.89" y1="26.3525" x2="8.89" y2="36.83" width="1.27" layer="16"/>
-<wire x1="19.05" y1="29.845" x2="20.6375" y2="31.4325" width="1.27" layer="16"/>
+<wire x1="8.89" y1="30.7975" x2="8.89" y2="36.83" width="1.27" layer="16"/>
 <contactref element="T2" pad="T2"/>
 <contactref element="T1" pad="T2"/>
-<wire x1="3.81" y1="26.3525" x2="8.89" y2="26.3525" width="1.27" layer="16"/>
 <wire x1="3.81" y1="38.1" x2="7.62" y2="38.1" width="1.27" layer="16"/>
 <wire x1="7.62" y1="38.1" x2="8.89" y2="36.83" width="1.27" layer="16"/>
 <wire x1="30.48" y1="24.13" x2="30.48" y2="26.67" width="0.6096" layer="16"/>
 <wire x1="30.48" y1="26.67" x2="32.385" y2="28.575" width="0.6096" layer="16"/>
 <wire x1="40.64" y1="24.13" x2="40.64" y2="26.67" width="0.6096" layer="16"/>
 <wire x1="40.64" y1="26.67" x2="39.37" y2="27.94" width="0.6096" layer="16"/>
+<wire x1="24.4475" y1="31.4325" x2="24.4475" y2="29.845" width="1.27" layer="16"/>
+<wire x1="3.81" y1="26.3525" x2="6.35" y2="26.3525" width="1.27" layer="16"/>
+<wire x1="8.89" y1="28.8925" x2="8.89" y2="30.7975" width="1.27" layer="16"/>
+<wire x1="6.35" y1="26.3525" x2="8.89" y2="28.8925" width="1.27" layer="16"/>
 </signal>
 <signal name="N$9">
 <contactref element="F1" pad="2"/>
@@ -2973,7 +2974,9 @@ type 0309, grid 2.5 mm</description>
 <signal name="N$2">
 <contactref element="OK1" pad="4"/>
 <contactref element="R1" pad="1"/>
-<wire x1="19.05" y1="27.305" x2="19.05" y2="24.13" width="1.27" layer="16"/>
+<wire x1="19.05" y1="24.13" x2="19.05" y2="26.9875" width="1.27" layer="16"/>
+<wire x1="19.05" y1="26.9875" x2="16.8275" y2="29.21" width="1.27" layer="16"/>
+<wire x1="16.8275" y1="29.21" x2="16.8275" y2="31.4325" width="1.27" layer="16"/>
 </signal>
 <signal name="N$11">
 <contactref element="R6" pad="2"/>
@@ -2984,7 +2987,7 @@ type 0309, grid 2.5 mm</description>
 <signal name="N$14">
 <contactref element="R3" pad="2"/>
 <contactref element="R7" pad="1"/>
-<wire x1="27.94" y1="35.56" x2="27.94" y2="34.29" width="1.27" layer="16"/>
+<wire x1="27.94" y1="36.5125" x2="27.94" y2="34.29" width="1.27" layer="16"/>
 </signal>
 <signal name="N$15">
 <contactref element="R9" pad="2"/>
@@ -3012,7 +3015,7 @@ type 0309, grid 2.5 mm</description>
 <signal name="N$19">
 <contactref element="OK4" pad="4"/>
 <contactref element="R8" pad="1"/>
-<wire x1="8.89" y1="21.59" x2="8.89" y2="20.32" width="1.27" layer="16"/>
+<wire x1="8.89" y1="23.1775" x2="8.89" y2="20.32" width="1.27" layer="16"/>
 <wire x1="8.89" y1="20.32" x2="7.62" y2="19.05" width="1.27" layer="16"/>
 <wire x1="7.62" y1="19.05" x2="7.62" y2="17.78" width="1.27" layer="16"/>
 </signal>

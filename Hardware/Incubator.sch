@@ -16007,7 +16007,6 @@ low-leakage double diode</description>
 <part name="S1" library="switch-omron" deviceset="10-XX" device=""/>
 <part name="S2" library="switch-omron" deviceset="10-XX" device=""/>
 <part name="S3" library="switch-omron" deviceset="10-XX" device=""/>
-<part name="S4" library="switch-omron" deviceset="10-XX" device=""/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="R3" library="resistor" deviceset="R-EU_" device="R0805" value="3 k"/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
@@ -16044,8 +16043,7 @@ low-leakage double diode</description>
 <part name="D1" library="diode" deviceset="BAV199" device="" value="BAV99"/>
 <part name="D2" library="diode" deviceset="BAV199" device="" value="BAV99"/>
 <part name="D3" library="diode" deviceset="BAV199" device="" value="BAV99"/>
-<part name="D4" library="diode" deviceset="BAV199" device="" value="BAV99"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0805" value="100"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0805" value="200"/>
 <part name="+3V5" library="supply1" deviceset="+3V3" device=""/>
 <part name="C11" library="rcl" deviceset="C-EU" device="C0805" value="0.1 uF"/>
 <part name="+3V6" library="supply1" deviceset="+3V3" device=""/>
@@ -16103,7 +16101,6 @@ download</text>
 <instance part="S1" gate="1" x="133.35" y="83.82" rot="R270"/>
 <instance part="S2" gate="1" x="147.32" y="78.74" rot="R270"/>
 <instance part="S3" gate="1" x="133.35" y="73.66" rot="R270"/>
-<instance part="S4" gate="1" x="147.32" y="68.58" rot="R270"/>
 <instance part="GND7" gate="1" x="91.44" y="76.2"/>
 <instance part="R3" gate="G$1" x="96.52" y="85.09" rot="R90"/>
 <instance part="P+1" gate="1" x="85.09" y="96.52"/>
@@ -16147,7 +16144,6 @@ download</text>
 <instance part="D1" gate="G$1" x="160.02" y="83.82" rot="R180"/>
 <instance part="D2" gate="G$1" x="160.02" y="78.74" rot="R180"/>
 <instance part="D3" gate="G$1" x="160.02" y="73.66" rot="R180"/>
-<instance part="D4" gate="G$1" x="160.02" y="68.58" rot="R180"/>
 <instance part="R4" gate="G$1" x="157.48" y="55.88" rot="R180"/>
 <instance part="+3V5" gate="G$1" x="156.21" y="49.53"/>
 <instance part="C11" gate="G$1" x="85.09" y="85.09"/>
@@ -16430,11 +16426,7 @@ download</text>
 <segment>
 <pinref part="IC1" gate="G$1" pin="PA2"/>
 <wire x1="92.71" y1="66.04" x2="116.84" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="116.84" y1="66.04" x2="116.84" y2="68.58" width="0.1524" layer="91"/>
-<pinref part="S4" gate="1" pin="P"/>
-<wire x1="116.84" y1="68.58" x2="116.84" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="142.24" y1="68.58" x2="116.84" y2="68.58" width="0.1524" layer="91"/>
-<junction x="116.84" y="68.58"/>
+<wire x1="116.84" y1="66.04" x2="116.84" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="U1" gate="G$1" pin="DB4"/>
 </segment>
 </net>
@@ -16550,22 +16542,13 @@ download</text>
 <pinref part="D3" gate="G$1" pin="A"/>
 </segment>
 </net>
-<net name="N$20" class="0">
-<segment>
-<pinref part="S4" gate="1" pin="S"/>
-<wire x1="152.4" y1="68.58" x2="154.94" y2="68.58" width="0.1524" layer="91"/>
-<pinref part="D4" gate="G$1" pin="A"/>
-</segment>
-</net>
 <net name="N$16" class="0">
 <segment>
 <pinref part="R8" gate="G$1" pin="2"/>
 <wire x1="166.37" y1="81.28" x2="166.37" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="166.37" y1="76.2" x2="166.37" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="166.37" y1="71.12" x2="166.37" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="166.37" y1="66.04" x2="166.37" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="166.37" y1="71.12" x2="166.37" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="166.37" y1="55.88" x2="166.37" y2="54.61" width="0.1524" layer="91"/>
-<junction x="166.37" y="66.04"/>
 <junction x="166.37" y="71.12"/>
 <junction x="166.37" y="76.2"/>
 <junction x="166.37" y="55.88"/>
@@ -16577,8 +16560,6 @@ download</text>
 <wire x1="160.02" y1="76.2" x2="166.37" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="D3" gate="G$1" pin="AC"/>
 <wire x1="160.02" y1="71.12" x2="166.37" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="D4" gate="G$1" pin="AC"/>
-<wire x1="160.02" y1="66.04" x2="166.37" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="R4" gate="G$1" pin="1"/>
 <wire x1="166.37" y1="55.88" x2="162.56" y2="55.88" width="0.1524" layer="91"/>
 </segment>
