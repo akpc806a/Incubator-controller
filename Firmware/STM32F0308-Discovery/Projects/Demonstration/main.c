@@ -1,4 +1,4 @@
-/**
+/**f
   ******************************************************************************
   * @file    main.c 
   * @author  MCD Application Team
@@ -39,30 +39,75 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+
+// if SOFTWARE_BEEP defined then buzzer without generator connected
+//#define SOFTWARE_BEEP
+
+// if PA9_AS_ZCD defined then zero-cross signal connected to PA9 instead of PA14
+// (to enable SWD debug) 
+//#define PA9_AS_ZCD
+
+// if defined, then temperature data send to UART
+//#define UART_SEND_TEMP
+
+// if defined, then test pin used for PA10
+//#define PA10_AS_TEST_PIN
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
 uint8_t BlinkSpeed = 0;
 
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-void Btns_Config()
+
+/* Beep ctrl -----------------------------------------------------------------*/
+
+
+#define BTN_BEEP_GPIO_PORT           GPIOA
+#define BTN_BEEP_GPIO_CLK            RCC_AHBPeriph_GPIOA
+#define BTN_BEEP_GPIO_PIN            GPIO_Pin_6
+
+unsigned char bBeep = 0; // if =1, then beep
+
+void Beep_Config()
 {
-  /* Initialize User_Button on STM32F0308-Discovery */
-  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_GPIO);
+  GPIO_InitTypeDef  GPIO_InitStructure;
+  
+  /* Enable the BTN_BEEP_GPIO_CLK Clock */
+  RCC_AHBPeriphClockCmd(BTN_BEEP_GPIO_CLK, ENABLE);
+  /* Configure the BTN_BEEP_GPIO_PIN pin */
+  GPIO_InitStructure.GPIO_Pin = BTN_BEEP_GPIO_PIN;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(BTN_BEEP_GPIO_PORT, &GPIO_InitStructure);
 }
 
-unsigned char bBtnUser = 0;
-unsigned char bPrevBtnUser = 0;
-
-#define BTN_USER_PRESSED ((bBtnUser != bPrevBtnUser) && (bBtnUser == 1))
-
-void Btns_Check()
+unsigned char bBeepState = 0;
+void Beep_Toggle()
 {
-  bPrevBtnUser = bBtnUser;
+  if (bBeepState)
+    GPIO_SetBits(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN);
+  else
+    GPIO_ResetBits(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN);
   
-  bBtnUser = STM_EVAL_PBGetState(BUTTON_USER);
+  bBeepState = !bBeepState;
+}
+
+void Beep_On()
+{
+  bBeep = 1;
+  GPIO_SetBits(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN);
+}
+
+void Beep_Off()
+{
+  bBeep = 0;
+  GPIO_ResetBits(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN);
 }
 
 
@@ -75,21 +120,33 @@ int iTriacDuty = 250; // 0..1000 -- from no to full power
 // Zero cross detection
 #define ZCD_GPIO_PORT             GPIOA
 #define ZCD_GPIO_CLK              RCC_AHBPeriph_GPIOA
-#define ZCD_GPIO_PIN              GPIO_Pin_4
+#ifdef PA9_AS_ZCD
+  #define ZCD_GPIO_PIN              GPIO_Pin_9
+#else
+  #define ZCD_GPIO_PIN              GPIO_Pin_14
+#endif
 
 #define ZCD_EXTI_PORT             EXTI_PortSourceGPIOA
-#define ZCD_EXTI_PIN              EXTI_PinSource4
-#define ZCD_EXTI_LINE             EXTI_Line4
+#ifdef PA9_AS_ZCD
+  #define ZCD_EXTI_PIN              EXTI_PinSource9
+  #define ZCD_EXTI_LINE             EXTI_Line9
+#else
+  #define ZCD_EXTI_PIN              EXTI_PinSource14
+  #define ZCD_EXTI_LINE             EXTI_Line14
+#endif
+
 // Triac out
 #define TRIAC_GPIO_PORT           GPIOB
 #define TRIAC_GPIO_CLK            RCC_AHBPeriph_GPIOB
-#define TRIAC_GPIO_PIN            GPIO_Pin_12
+#define TRIAC_GPIO_PIN            GPIO_Pin_1
 
 
 // Test out
-#define TEST_GPIO_PORT           GPIOB
-#define TEST_GPIO_CLK            RCC_AHBPeriph_GPIOA
-#define TEST_GPIO_PIN            GPIO_Pin_11
+#ifdef PA10_AS_TEST_PIN
+  #define TEST_GPIO_PORT           GPIOA
+  #define TEST_GPIO_CLK            RCC_AHBPeriph_GPIOA
+  #define TEST_GPIO_PIN            GPIO_Pin_10
+#endif
 
 void TriacPins_Config()
 {
@@ -132,15 +189,17 @@ void TriacPins_Config()
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(TRIAC_GPIO_PORT, &GPIO_InitStructure);
   
-  /* Enable the TEST_GPIO_CLK Clock */
-  RCC_AHBPeriphClockCmd(TEST_GPIO_CLK, ENABLE);
-  /* Configure the TEST_GPIO_PIN pin */
-  GPIO_InitStructure.GPIO_Pin = TEST_GPIO_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(TEST_GPIO_PORT, &GPIO_InitStructure);
+  #ifdef PA10_AS_TEST_PIN
+    /* Enable the TEST_GPIO_CLK Clock */
+    RCC_AHBPeriphClockCmd(TEST_GPIO_CLK, ENABLE);
+    /* Configure the TEST_GPIO_PIN pin */
+    GPIO_InitStructure.GPIO_Pin = TEST_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(TEST_GPIO_PORT, &GPIO_InitStructure);
+  #endif
 }
 
 // variables for timer configuration
@@ -229,16 +288,18 @@ void EXTI4_15_IRQHandler(void)
 {
   EXTI_ClearITPendingBit(ZCD_EXTI_LINE);
 
-if (GPIO_ReadInputDataBit(ZCD_GPIO_PORT, ZCD_GPIO_PIN))
-  GPIO_SetBits(TEST_GPIO_PORT, TEST_GPIO_PIN);
-else
-  GPIO_ResetBits(TEST_GPIO_PORT, TEST_GPIO_PIN);
+#ifdef PA10_AS_TEST_PIN
+  if (GPIO_ReadInputDataBit(ZCD_GPIO_PORT, ZCD_GPIO_PIN))
+    GPIO_SetBits(TEST_GPIO_PORT, TEST_GPIO_PIN);
+  else
+    GPIO_ResetBits(TEST_GPIO_PORT, TEST_GPIO_PIN);
+#endif
   
   if (GPIO_ReadInputDataBit(ZCD_GPIO_PORT, ZCD_GPIO_PIN))
   {
     // rising edge!
     
-    TIM15->CNT = 0; // restart shift delay timer 
+    TIM14->CNT = 0; // restart shift delay timer 
     
     iPeriodNew = TIM17->CNT;
     TIM17->CNT = 0;
@@ -282,7 +343,7 @@ else
       // update compare value for delay timer
       CCR1_Val = iWidth/2 - iWidth/4;
       TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
-      TIM_OC1Init(TIM15, &TIM_OCInitStructure);
+      TIM_OC1Init(TIM14, &TIM_OCInitStructure);
     }
   }
 }
@@ -334,7 +395,7 @@ void ShiftTimer_Config()
   CCR1_Val = 1000; 
 
   /* TIM1 clock enable */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);  
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14, ENABLE);  
  
   /* Compute the prescaler value */
   PrescalerValue = (uint16_t) (SystemCoreClock  / 100000) - 1;
@@ -345,43 +406,43 @@ void ShiftTimer_Config()
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
-  TIM_TimeBaseInit(TIM15, &TIM_TimeBaseStructure);
+  TIM_TimeBaseInit(TIM14, &TIM_TimeBaseStructure);
 
   /* Prescaler configuration */
-  TIM_PrescalerConfig(TIM15, PrescalerValue, TIM_PSCReloadMode_Immediate);
+  TIM_PrescalerConfig(TIM14, PrescalerValue, TIM_PSCReloadMode_Immediate);
   
   /* Output Compare Timing Mode configuration: Channel1 */
   // according to http://www-micrel.deis.unibo.it/LABARCH_2012/slidecorso2012/lab4.pdf
   TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
   TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
-  TIM_OC1Init(TIM15, &TIM_OCInitStructure);
-  TIM_OC1PreloadConfig(TIM15, TIM_OCPreload_Disable);
+  TIM_OC1Init(TIM14, &TIM_OCInitStructure);
+  TIM_OC1PreloadConfig(TIM14, TIM_OCPreload_Disable);
   
-  /* Enable the TIM15 Trigger and commutation interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+  /* Enable the TIM14 Trigger and commutation interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TIM14_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);   
 
-  /* TIM15 enable counter */
-  TIM_Cmd(TIM15, ENABLE);
+  /* TIM14 enable counter */
+  TIM_Cmd(TIM14, ENABLE);
   
-  TIM_ITConfig(TIM15, TIM_IT_CC1, ENABLE);
+  TIM_ITConfig(TIM14, TIM_IT_CC1, ENABLE);
 }
 
 
-// TIM15 compare interrupt -- test signal
+// TIM14 compare interrupt -- test signal
 unsigned char bOut = 0;
 unsigned char b50HzOut = 1;
 unsigned char bBtnPressed50HzOut = 0;
 
-void TIM15_IRQHandler()
+void TIM14_IRQHandler()
 {
-  if(TIM_GetITStatus(TIM15, TIM_IT_CC1) == SET) 
+  if(TIM_GetITStatus(TIM14, TIM_IT_CC1) == SET) 
   {
-    TIM_ClearITPendingBit(TIM15, TIM_IT_CC1);
-    //TIM15->CNT = 0;
+    TIM_ClearITPendingBit(TIM14, TIM_IT_CC1);
+    //TIM14->CNT = 0;
 
     // restart triac timer
     if (iTriacDuty != MAX_TRIAC_DUTY)
@@ -408,8 +469,8 @@ void TIM15_IRQHandler()
       TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
       TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
       TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
-      TIM_OC1Init(TIM15, &TIM_OCInitStructure);
-      TIM_OC1PreloadConfig(TIM15, TIM_OCPreload_Disable);
+      TIM_OC1Init(TIM14, &TIM_OCInitStructure);
+      TIM_OC1PreloadConfig(TIM14, TIM_OCPreload_Disable);
       
       bBtnPressed50HzOut = 0;
     }
@@ -445,9 +506,8 @@ float fY_0 = 0; // initial value
 double fTau = 0;
 double fK = 0;
 
-// PI coefficients
-float fK_p;
-float fK_i;
+float fK_p = 16.23729;
+float fK_i = 0.019;
 
 unsigned char bTuningMode = 0; // if =1 then automatic tuning activated
 
@@ -567,85 +627,82 @@ float Tuning_CalculateMaxError()
 
 
 /* USART ------------------------------------------------------------------------*/
+#ifdef UART_SEND_TEMP
 
-#define USART                        USART1
-#define USART_CLK                    RCC_APB2Periph_USART1
+  #define USART                        USART1
+  #define USART_CLK                    RCC_APB2Periph_USART1
 
-#define USART_TX_PIN                 GPIO_Pin_9
-#define USART_TX_GPIO_PORT           GPIOA
-#define USART_TX_GPIO_CLK            RCC_AHBPeriph_GPIOA
-#define USART_TX_SOURCE              GPIO_PinSource9
-#define USART_TX_AF                  GPIO_AF_1
+  #define USART_TX_PIN                 GPIO_Pin_9
+  #define USART_TX_GPIO_PORT           GPIOA
+  #define USART_TX_GPIO_CLK            RCC_AHBPeriph_GPIOA
+  #define USART_TX_SOURCE              GPIO_PinSource9
+  #define USART_TX_AF                  GPIO_AF_1
 
-#define USART_RX_PIN                 GPIO_Pin_10
-#define USART_RX_GPIO_PORT           GPIOA
-#define USART_RX_GPIO_CLK            RCC_AHBPeriph_GPIOA
-#define USART_RX_SOURCE              GPIO_PinSource10
-#define USART_RX_AF                  GPIO_AF_1
+  #define USART_RX_PIN                 GPIO_Pin_10
+  #define USART_RX_GPIO_PORT           GPIOA
+  #define USART_RX_GPIO_CLK            RCC_AHBPeriph_GPIOA
+  #define USART_RX_SOURCE              GPIO_PinSource10
+  #define USART_RX_AF                  GPIO_AF_1
 
-void USART_Config()
-{
-  USART_InitTypeDef USART_InitStructure;
-  GPIO_InitTypeDef GPIO_InitStructure;
-
-  USART_InitStructure.USART_BaudRate = 9600;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_2;
-  USART_InitStructure.USART_Parity = USART_Parity_No;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-  
-  /* Enable GPIO clock */
-  RCC_AHBPeriphClockCmd(USART_TX_GPIO_CLK | USART_RX_GPIO_CLK, ENABLE);
-
-  /* Enable USART clock */
-  RCC_APB2PeriphClockCmd(USART_CLK, ENABLE); 
-
-  /* Connect PXx to USARTx_Tx */
-  GPIO_PinAFConfig(USART_TX_GPIO_PORT, USART_TX_SOURCE, USART_TX_AF);
-
-  /* Connect PXx to USARTx_Rx */
-  GPIO_PinAFConfig(USART_RX_GPIO_PORT, USART_RX_SOURCE, USART_RX_AF);
-  
-  /* Configure USART Tx as alternate function push-pull */
-  GPIO_InitStructure.GPIO_Pin = USART_TX_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-  GPIO_Init(USART_TX_GPIO_PORT, &GPIO_InitStructure);
-    
-  /* Configure USART Rx as alternate function push-pull */
-  GPIO_InitStructure.GPIO_Pin = USART_RX_PIN;
-  GPIO_Init(USART_RX_GPIO_PORT, &GPIO_InitStructure);
-
-  /* USART configuration */
-  USART_Init(USART, &USART_InitStructure);
-    
-  /* Enable USART */
-  USART_Cmd(USART, ENABLE);
-}
-
-void USART_SendStr_Blocking(char* Str)
-{
-  while (*Str != 0)
+  void USART_Config()
   {
-	  USART_SendData(USART, *Str);
-	  /* Wait till holding buffer empty */
-	  while(USART_GetFlagStatus(USART, USART_FLAG_TXE) == RESET) {};
-    Str++;
-  }
-}
+    USART_InitTypeDef USART_InitStructure;
+    GPIO_InitTypeDef GPIO_InitStructure;
 
+    USART_InitStructure.USART_BaudRate = 9600;
+    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+    USART_InitStructure.USART_StopBits = USART_StopBits_2;
+    USART_InitStructure.USART_Parity = USART_Parity_No;
+    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    
+    /* Enable GPIO clock */
+    RCC_AHBPeriphClockCmd(USART_TX_GPIO_CLK | USART_RX_GPIO_CLK, ENABLE);
+
+    /* Enable USART clock */
+    RCC_APB2PeriphClockCmd(USART_CLK, ENABLE); 
+
+    /* Connect PXx to USARTx_Tx */
+    GPIO_PinAFConfig(USART_TX_GPIO_PORT, USART_TX_SOURCE, USART_TX_AF);
+
+    /* Connect PXx to USARTx_Rx */
+    GPIO_PinAFConfig(USART_RX_GPIO_PORT, USART_RX_SOURCE, USART_RX_AF);
+    
+    /* Configure USART Tx as alternate function push-pull */
+    GPIO_InitStructure.GPIO_Pin = USART_TX_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init(USART_TX_GPIO_PORT, &GPIO_InitStructure);
+      
+    /* Configure USART Rx as alternate function push-pull */
+    GPIO_InitStructure.GPIO_Pin = USART_RX_PIN;
+    GPIO_Init(USART_RX_GPIO_PORT, &GPIO_InitStructure);
+
+    /* USART configuration */
+    USART_Init(USART, &USART_InitStructure);
+      
+    /* Enable USART */
+    USART_Cmd(USART, ENABLE);
+  }
+
+  void USART_SendStr_Blocking(char* Str)
+  {
+    while (*Str != 0)
+    {
+      USART_SendData(USART, *Str);
+      /* Wait till holding buffer empty */
+      while(USART_GetFlagStatus(USART, USART_FLAG_TXE) == RESET) {};
+      Str++;
+    }
+  }
+#endif
 /* ------------------------------------------------------------------------------*/
-// parameters for continious PI controller
-#define K_p 16.2372904638555
-//#define K_i_ 0.0178340244220535
-#define K_i_ 0.019
 // sampling time [sec]
 #define t_s 5
 // K_i for discrete action
-#define K_i (K_i_*t_s)
+#define K_i (fK_i*t_s)
 
 // output limits
 #define u_max 100
@@ -660,7 +717,7 @@ float PI_Controller(float e)
   float u;
   
   // control
-  u = K_i*fInt + K_p*e;
+  u = K_i*fInt + fK_p*e;
 
   // integrator action
   if (u > u_max || u < u_min)
@@ -677,19 +734,565 @@ float PI_Controller(float e)
   return u;
 }
 
-/* ------------------------------------------------------------------------------*/
-
+/* System variables ----------------------------------------------------------*/
 int iTriacDutyPrev = 0; 
 int iTimerDelayPrev = 0;
 
 float fTemprRef = 35.5; // temperature reference
-float fTempr = 0; // current temperature
+float fTempr = 35.5; // current temperature
 
 int iPeriodCycle = 0; // period cycle counter for PI-auto-tuning
 #define SENSOR_CONVERSION_DURATION 750 // DS18B20 conversion time in ms
 //#define CYCLE_DURATION 5000 // cycle duration in ms
 #define CYCLE_DURATION (t_s*1000) // cycle duration in ms
 #define END_PAUSE_DURATION (CYCLE_DURATION - SENSOR_CONVERSION_DURATION)
+
+// rotate timer
+unsigned short int iRotatePeriod = 60; // in minutes
+unsigned short int iRotateDuration = 20; // in seconds
+
+// sensor calibration
+float fSensK = 1; // gain
+float fSensO = 0; // offset
+
+float fE; // temperature feedback error
+  
+
+// state of main menu
+typedef enum {MENU_MAIN_NONE = 0, MENU_MAIN_BASIC, MENU_MAIN_ADVANCED, MENU_MAIN_LAST} main_menu_state_t;
+main_menu_state_t bMainMenuState = MENU_MAIN_NONE;
+char* sMainMenuCaptions[] = {"", "Basic", "Advancd"}; // main menu captions
+// state of basic menu
+typedef enum {MENU_BASIC_T_REF = 0, MENU_BASIC_ROTATE_INTERVAL, MENU_BASIC_ROTATE_DURATIOIN, MENU_BASIC_LAST} basic_menu_state_t;
+basic_menu_state_t bBasicMenuState = MENU_BASIC_T_REF;
+char* sBasicMenuCaptions[] = {"Temp.ref", "Rot.int", "Rot.dur",}; // basic menu captions
+char sBasicMenuStartDigit[] = {3, 3, 3}; // digit that start to modify first
+
+// state of advanced menu
+typedef enum {MENU_ADV_O = 0, MENU_ADV_K, MENU_ADV_PID_K_P, MENU_ADV_PID_K_I, MENU_ADV_PID_AUTO, MENU_ADV_LAST} adv_menu_state_t;
+adv_menu_state_t bAdvMenuState = MENU_ADV_O;
+char* sAdvMenuCaptions[] = {"T. Ofst", "T. Gain", "PID K_P", "PID K_I", "PID Auto"}; // basic menu captions
+char sAdvMenuStartDigit[] = {7, 7, 7, 7, 7};
+
+unsigned char bSubMenu = 0; // if =1 then basic or advanced menu selected
+unsigned char bParameterSet = 0; // if =1 then show parameter
+
+unsigned char bUpdateLCD = 0; // if =1 then LCD should be updated ASAP
+unsigned char bStoreParams = 0; // if =1 then request to store parameters in flash
+
+unsigned char bBlinkEn = 0; // if =1 then enable blink digit at LCD
+unsigned char bBlinkLCD = 0; // blink now
+unsigned char bBlinkIndex = 0; // index of digit to blink
+
+
+// error handler variables
+#define TEMP_ERROR_COUNT 5 // max concecutive ds18b20 errors before beep
+unsigned char iError_TempCount = 0; // counter for ds18b20 errors
+#define HEATER_ERROR_INTERVAL (30*60) // duration of output saturation before error signal [in sec]
+#define HEATER_ERROR_COUNT (HEATER_ERROR_INTERVAL/t_s)
+int iError_HeaterCount = 0; // counter for output saturation
+#define MAX_TEMP_ERROR 2.0 // maximum acceptable temperature error for heater fault check [oC]
+
+
+int iSecTimer; // timer for second
+char sLine1[16]; // LCD line 1
+char sLine2[16]; // LCD line 2
+/* Buttons handler -----------------------------------------------------------*/
+
+unsigned char bBtnMode = 0;
+unsigned char bPrevBtnMode = 0;
+unsigned char bBtnSet = 0;
+unsigned char bPrevBtnSet = 0;
+unsigned char bBtnInc = 0;
+unsigned char bPrevBtnInc = 0;
+
+unsigned char bBtnIndex = 0; // index of tested button
+
+#define BTN_MODE_PRESSED ((bBtnMode != bPrevBtnMode) && (bBtnMode == 1))
+#define BTN_SET_PRESSED ((bBtnSet != bPrevBtnSet) && (bBtnSet == 1))
+#define BTN_INC_PRESSED ((bBtnInc != bPrevBtnInc) && (bBtnInc == 1))
+
+char sTmp[8];
+float IncDigit(char* S, int Index, float Div)
+{
+  float fRes = 0;
+  signed char i;
+  unsigned char iLast = 7;
+  float fFactor = 1;
+  
+  // decrement digit
+  if (S[Index] == '9') 
+    S[Index] = '0';
+  else
+    S[Index] = S[Index] + 1;
+
+  // last character
+  for (i = 0; i < 8; i++)
+    if (S[i] == ' ') 
+    {
+      iLast = i-1; break;
+    }
+
+  for (i = iLast; i >= 0; i--)
+    if (S[i] != '.')
+    {
+      if (S[i] == '+' || S[i] == '-') continue;
+      fRes = fRes + (S[i] - 0x30)*fFactor; 
+      fFactor = fFactor*10;
+    }
+    
+  return fRes/Div;
+}
+
+
+void Btns_Check()
+{  
+  GPIO_InitTypeDef  GPIO_InitStructure;
+
+  if (bBeep) return; // if beep, then reset
+  
+  /* Configure the BTN_BEEP_GPIO_PIN pin as input */
+  GPIO_InitStructure.GPIO_Pin = BTN_BEEP_GPIO_PIN;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(BTN_BEEP_GPIO_PORT, &GPIO_InitStructure);
+  
+  if (bBtnIndex == 0)
+  {
+    LCD_HAL_Write(0x10);
+    if (GPIO_ReadInputDataBit(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN))
+      bBtnMode = 1;
+    else
+      bBtnMode = 0;
+  }
+  else
+  if (bBtnIndex == 1)
+  {
+    LCD_HAL_Write(0x20);
+    if (GPIO_ReadInputDataBit(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN))
+      bBtnSet = 1;
+    else
+      bBtnSet = 0;
+  }
+  else
+  if (bBtnIndex == 2)
+  {
+    LCD_HAL_Write(0x40);
+    if (GPIO_ReadInputDataBit(BTN_BEEP_GPIO_PORT, BTN_BEEP_GPIO_PIN))
+      bBtnInc = 1;
+    else
+      bBtnInc = 0;
+  }
+  
+  bBtnIndex++;
+  if (bBtnIndex == 3) bBtnIndex = 0;
+
+  
+  if (BTN_MODE_PRESSED)
+  {
+    if (bSubMenu == 0)
+    {
+      // main menu selection
+      bMainMenuState++;
+      if (bMainMenuState == MENU_MAIN_LAST) bMainMenuState = 0;
+    }
+    else
+    {
+      // sub menu selection
+      if (bMainMenuState == MENU_MAIN_BASIC)
+      {
+        bBasicMenuState++;
+        if (bBasicMenuState == MENU_BASIC_LAST) { bBasicMenuState = 0; bSubMenu = 0; }      
+      }
+      else
+      if (bMainMenuState == MENU_MAIN_ADVANCED)
+      {
+        bAdvMenuState++;
+        if (bAdvMenuState == MENU_ADV_LAST) { bAdvMenuState = 0; bSubMenu = 0; }      
+      }
+    }
+    
+    bParameterSet = 0;
+    bBlinkEn = 0;
+    bBlinkLCD = 0;
+    
+    bUpdateLCD = 1;
+  }
+  
+  if (BTN_SET_PRESSED)
+  {
+    if (bMainMenuState != MENU_MAIN_NONE)
+    {
+      if (bSubMenu == 0)
+      {
+        bSubMenu = 1;
+      }
+      else
+      {
+        if (bParameterSet == 0)
+        {
+          bParameterSet = 1;
+          if (bMainMenuState == MENU_MAIN_ADVANCED && bAdvMenuState == MENU_ADV_PID_AUTO)
+            sprintf(sLine2, "Ready  .");
+        }
+        else
+        {
+          if (bBlinkEn == 0)
+          {
+            if (bMainMenuState == MENU_MAIN_BASIC)
+            {
+              bBlinkIndex = sBasicMenuStartDigit[bBasicMenuState];
+            }
+            else
+            if (bMainMenuState == MENU_MAIN_ADVANCED)
+            {
+              bBlinkIndex = sAdvMenuStartDigit[bAdvMenuState];
+            }
+            
+            bBlinkEn = 1;
+          }
+          else
+          {
+            if (bBlinkIndex > 0)
+            {
+              if (bMainMenuState == MENU_MAIN_ADVANCED && bAdvMenuState == MENU_ADV_PID_AUTO)
+              {
+              }
+              else
+              {
+                bBlinkIndex--;
+                if (sLine2[bBlinkIndex] == '.') bBlinkIndex--;
+              }
+            }
+            else
+            {
+              if (bMainMenuState == MENU_MAIN_BASIC)
+              {
+                bBlinkIndex = sBasicMenuStartDigit[bBasicMenuState];
+              }
+              else
+              if (bMainMenuState == MENU_MAIN_ADVANCED)
+              {
+                bBlinkIndex = sAdvMenuStartDigit[bAdvMenuState];
+              }
+            }
+          }
+        }
+      }
+      
+      bUpdateLCD = 1;
+    }
+  }
+  
+  if (BTN_INC_PRESSED)
+  {
+    // update parameter
+    if (bBlinkEn)
+    {
+      bUpdateLCD = 1;
+      bStoreParams = 1;
+      
+      if (bMainMenuState == MENU_MAIN_BASIC)
+      {
+        if (bBasicMenuState == MENU_BASIC_T_REF)
+        {
+          fTemprRef = IncDigit(sLine2, bBlinkIndex, 10);
+        }
+        if (bBasicMenuState == MENU_BASIC_ROTATE_INTERVAL)
+        {
+          iRotatePeriod = IncDigit(sLine2, bBlinkIndex, 1);
+        }
+        if (bBasicMenuState == MENU_BASIC_ROTATE_DURATIOIN)
+        {
+          iRotateDuration = IncDigit(sLine2, bBlinkIndex, 10);
+        }
+      }
+      else
+      if (bMainMenuState == MENU_MAIN_ADVANCED)
+      {
+        if (bAdvMenuState == MENU_ADV_O)
+        {
+          if (bBlinkIndex == 0)
+            fSensO = -fSensO;
+          else
+            fSensO = IncDigit(sLine2, bBlinkIndex, 100000);
+        }
+        else
+        if (bAdvMenuState == MENU_ADV_K)
+          fSensK = IncDigit(sLine2, bBlinkIndex, 1000000);
+        else
+        if (bAdvMenuState == MENU_ADV_PID_K_P)
+          fK_p = IncDigit(sLine2, bBlinkIndex, 100000);
+        else
+        if (bAdvMenuState == MENU_ADV_PID_K_I)
+          fK_i = IncDigit(sLine2, bBlinkIndex, 1000000);
+        else
+        if (bAdvMenuState == MENU_ADV_PID_AUTO)
+        {
+          if (bTuningMode == 0)
+          {
+            // activate auto-tuning mode
+            bTuningMode = 1;
+            // full turn-on of heater
+            iTriacDuty = MAX_TRIAC_DUTY;
+            Timer_LoadCompare(iPeriod - (iPeriod*iTriacDuty / MAX_TRIAC_DUTY));
+            // prepare for auto-tuning
+            iPeriodCycle = 0;
+            Tuning_Start(fTempr);
+          }
+          else
+          {
+            // finilizing auto-tuning            
+            if (Tuning_Finilize(fTempr) == TUNING_RESULT_OK)
+            {
+              fE = Tuning_CalculateMaxError();
+              sprintf(sLine2, "ok! %2.1f %%", fE);
+            }
+            else
+            {
+              sprintf(sLine2, "failed:(");
+              bStoreParams = 0;
+            }
+            LCD_DisplayStringLine(1, sLine2);
+            bUpdateLCD = 0;
+            bTuningMode = 0;
+          }
+        }
+      }
+      
+      
+    }
+  }
+
+  
+  bPrevBtnMode = bBtnMode;
+  bPrevBtnSet = bBtnSet;
+  bPrevBtnInc = bBtnInc;
+  
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_Init(BTN_BEEP_GPIO_PORT, &GPIO_InitStructure);
+  
+
+}
+
+char sTmpLine[10];
+void UpdateLCD()
+{
+  // display temperature in normal case
+  if (bMainMenuState == MENU_MAIN_NONE)
+  {
+    sprintf(sLine1, "%2.1f oC ", fTempr);
+    LCD_DisplayStringLine(0, sLine1);
+    
+    sprintf(sLine2, "%d%%  ", iTriacDuty/10);
+    LCD_DisplayStringLine(1, sLine2);
+    
+    return;
+  }
+  
+  // update LCD according to current menu state
+  if (bParameterSet == 0)
+  {
+    if (bSubMenu == 0)
+    {
+      sprintf(sLine1, "%-8s", sMainMenuCaptions[bMainMenuState]);      
+      sprintf(sLine2, "%-8s", "");
+    }
+    else
+    if (bSubMenu == 1)
+    {
+      sprintf(sLine1, "%-8s", sMainMenuCaptions[bMainMenuState]);        
+      if (bMainMenuState == MENU_MAIN_BASIC)
+      {
+        sprintf(sLine2, "%-8s", sBasicMenuCaptions[bBasicMenuState]);
+      }
+      else
+      if (bMainMenuState == MENU_MAIN_ADVANCED)
+      {
+        sprintf(sLine2, "%-8s", sAdvMenuCaptions[bAdvMenuState]);
+      }
+    }
+  }
+  else
+  {
+    if (bMainMenuState == MENU_MAIN_BASIC)
+    {
+      sprintf(sLine1, "%-8s", sBasicMenuCaptions[bBasicMenuState]);
+      
+      if (bBasicMenuState == MENU_BASIC_T_REF)
+        sprintf(sLine2, "%04.1f  oC", fTemprRef);
+      else
+      if (bBasicMenuState == MENU_BASIC_ROTATE_INTERVAL)
+        sprintf(sLine2, "%04d min", iRotatePeriod);
+      else
+      if (bBasicMenuState == MENU_BASIC_ROTATE_DURATIOIN)
+        sprintf(sLine2, "%04d sec", iRotateDuration);
+    }
+    else
+    if (bMainMenuState == MENU_MAIN_ADVANCED)
+    {
+      sprintf(sLine1, "%-8s", sAdvMenuCaptions[bAdvMenuState]);
+      
+      if (bAdvMenuState == MENU_ADV_O)
+        sprintf(sLine2, "%+8.6f", fSensO);
+      else
+      if (bAdvMenuState == MENU_ADV_K)
+        sprintf(sLine2, "%8.6f", fSensK);
+      else
+      if (bAdvMenuState == MENU_ADV_PID_K_P)
+        sprintf(sLine2, "%8.5f", fK_p);
+      else
+      if (bAdvMenuState == MENU_ADV_PID_K_I)
+        sprintf(sLine2, "%8.6f", fK_i);
+      else
+      if (bAdvMenuState == MENU_ADV_PID_AUTO)
+      {
+        if (bTuningMode)
+        {
+          sprintf(sLine1, "%2.1f oC", fTempr);
+          sprintf(sLine2, "Tuning..");
+        }
+      }
+    }
+  }
+  
+  strcpy(sTmpLine, sLine2);
+  if (bBlinkLCD)
+  {
+    sTmpLine[bBlinkIndex] = ' ';
+  }
+  
+  LCD_DisplayStringLine(0, sLine1);
+  LCD_DisplayStringLine(1, sTmpLine);
+}
+
+/* Parameters store/recall ---------------------------------------------------*/
+#define FLASH_PARAM_BASE 0x08003C00 // last page in program memory for parameters
+#define FLASH_TEMP_REF_OFST 0
+#define FLASH_ROTATE_PERIOD_OFST 1
+#define FLASH_ROTATE_DURATION_OFST 2
+#define FLASH_SENS_K_OFST 3
+#define FLASH_SENS_O_OFST 4
+#define FLASH_PID_K_P_OFST 5
+#define FLASH_PID_K_I_OFST 6
+
+
+
+void Flash_StoreParameters()
+{
+  FLASH_Unlock();
+  
+  if (FLASH_ErasePage(FLASH_PARAM_BASE) != FLASH_COMPLETE) return; // TODO: fault handling here
+  
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_TEMP_REF_OFST*4, *((uint32_t*)(&fTemprRef)));
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_ROTATE_PERIOD_OFST*4, iRotatePeriod); 
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_ROTATE_DURATION_OFST*4, iRotateDuration);
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_SENS_K_OFST*4, *((uint32_t*)(&fSensK))); 
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_SENS_O_OFST*4, *((uint32_t*)(&fSensO))); 
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_PID_K_P_OFST*4, *((uint32_t*)(&fK_p)));
+  FLASH_ProgramWord(FLASH_PARAM_BASE + FLASH_PID_K_I_OFST*4, *((uint32_t*)(&fK_i)));
+  
+  FLASH_Lock();
+}
+
+void Flash_LoadParameters()
+{
+  int iTmp;
+  iTmp = *((int*)(FLASH_PARAM_BASE + FLASH_TEMP_REF_OFST*4));
+  if (iTmp == -1) 
+  { 
+    Flash_StoreParameters(); 
+    return; 
+  }
+
+  fTemprRef = *((float*)(FLASH_PARAM_BASE + FLASH_TEMP_REF_OFST*4));
+  iRotatePeriod = *((int*)(FLASH_PARAM_BASE + FLASH_ROTATE_PERIOD_OFST*4)); 
+  iRotateDuration = *((int*)(FLASH_PARAM_BASE + FLASH_ROTATE_DURATION_OFST*4));
+  fSensK = *((float*)(FLASH_PARAM_BASE + FLASH_SENS_K_OFST*4)); 
+  fSensO = *((float*)(FLASH_PARAM_BASE + FLASH_SENS_O_OFST*4)); 
+  fK_p = *((float*)(FLASH_PARAM_BASE + FLASH_PID_K_P_OFST*4));
+  fK_i = *((float*)(FLASH_PARAM_BASE + FLASH_PID_K_I_OFST*4));
+}
+/* Rotation ------------------------------------------------------------------*/
+#define ROTATION_GPIO_PORT           GPIOA
+#define ROTATION_GPIO_CLK            RCC_AHBPeriph_GPIOA
+#define ROTATION_GPIO_PIN            GPIO_Pin_10
+
+void Rotation_Config()
+{
+  GPIO_InitTypeDef  GPIO_InitStructure;
+  
+  /* Enable the ROTATION_GPIO_CLK Clock */
+  RCC_AHBPeriphClockCmd(ROTATION_GPIO_CLK, ENABLE);
+  /* Configure the ROTATION_GPIO_PIN pin */
+  GPIO_InitStructure.GPIO_Pin = ROTATION_GPIO_PIN;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(ROTATION_GPIO_PORT, &GPIO_InitStructure);
+}
+
+#define Rotation_On() GPIO_SetBits(ROTATION_GPIO_PORT, ROTATION_GPIO_PIN);
+#define Rotation_Off() GPIO_ResetBits(ROTATION_GPIO_PORT, ROTATION_GPIO_PIN);
+
+int iSecRotation = 0; // for 1 sec duration
+int iMinRotation = 0; // for 1 min duration
+unsigned char bRotationOn = 0;
+
+unsigned short int iRotatePeriod_Timer = 0; // in minutes
+unsigned short int iRotateDuration_Timer = 0; // in seconds
+
+// called every 1 sec for rotation timer function
+void Rotate_Check()
+{
+  iMinRotation++;
+  if (iMinRotation == 60)
+  {
+    iMinRotation = 0;
+    
+    iRotatePeriod_Timer++;
+    if (iRotatePeriod_Timer >= iRotatePeriod)
+    {
+      iRotatePeriod_Timer = 0;
+      bRotationOn = 1;
+      Rotation_On();
+    }
+  }
+  
+  if (bRotationOn)
+  {
+    iRotateDuration_Timer++;
+    if (iRotateDuration_Timer >= iRotateDuration)
+    {
+      Rotation_Off();
+      iRotateDuration_Timer = 0;
+    }
+  }
+}
+
+
+
+void IWDT_Init(void)
+{
+  /* Enable write access to IWDG_PR and IWDG_RLR registers */
+  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+
+  /* IWDG counter clock: LSI/256, ~6.4ms */
+  IWDG_SetPrescaler(IWDG_Prescaler_256);
+
+  IWDG_SetReload(1250); // IWDG timeout 6.4ms*1250 = ~ 8 sec
+
+  /* Reload IWDG counter */
+  IWDG_ReloadCounter();
+
+  /* Enable IWDG (the LSI oscillator will be enabled by hardware) */
+  IWDG_Enable();
+
+}
+/* MAIN ----------------------------------------------------------------------*/
 
 /**
   * @brief  Main program.
@@ -702,35 +1305,51 @@ int main(void)
   int iRes = 0;
   unsigned char bData[8];
   RCC_ClocksTypeDef RCC_Clocks;
-  float fE; // temperature feedback error
-  
-  /* Configure LED3 and LED4 on STM32F0308-Discovery */
-  STM_EVAL_LEDInit(LED3);
-  STM_EVAL_LEDInit(LED4);
-  
-	STM_EVAL_LEDOn(LED4);
-  STM_EVAL_LEDToggle(LED3);
   
   /* SysTick end of count event each 1ms */
   RCC_GetClocksFreq(&RCC_Clocks);
   SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
+ 
+  Delay(100);
   
-  Btns_Config();
+  Beep_Config();
   
   LCD_Setup();
-  LCD_DisplayStringLine(0, "Hello");
+  LCD_DisplayStringLine(0, "ver 1.00");
+  Delay(1000);
+/* 
+while (1)
+{
+  Btns_Check();
+  
+  if (bUpdateLCD)
+  {
+    UpdateLCD();
+    bUpdateLCD = 0;
+  }
+  
+  Delay(10);
+}
+*/
+
+  Flash_LoadParameters();
 	
   TriacPins_Config();
   TriacTimer_Config();
   PeriodTimer_Config();
   ShiftTimer_Config();
   
-  USART_Config();
-
+  Rotation_Config();
+  IWDT_Init();
+  
+  #ifdef UART_SEND_TEMP
+    USART_Config();
+  #endif
+  
   ds_init();
 
   while (1)
-  {
+  {    
     ds_start_convert_single();
     ds_strong_pull_up(1);
     
@@ -749,11 +1368,24 @@ int main(void)
         // update compare value for triac timer
         if (iTriacDuty > 1)
           Timer_LoadCompare(iPeriod - (iPeriod*iTriacDuty / MAX_TRIAC_DUTY));
-        
-        sprintf(sTmp, "%04d", iTriacDuty);
-        LCD_DisplayStringLine(0, sTmp);
       }
       iTriacDutyPrev = iTriacDuty;
+      
+      // heater fault check
+      if (fabs(fE) > MAX_TEMP_ERROR)
+      {
+        iError_HeaterCount++; 
+        if (iError_HeaterCount >= HEATER_ERROR_COUNT) 
+        {
+          Beep_On();
+        }
+      }
+      else
+      {
+        iError_HeaterCount = 0;
+        Beep_Off();
+      }
+      
     }
     else
     {
@@ -763,11 +1395,14 @@ int main(void)
     
     
     // output temperature
-    sprintf(sTmp, "%2.1f oC", fTempr);
-    LCD_DisplayStringLine(1, sTmp);
-    sprintf(sTmp, "%2.1f\r\n", fTempr);
-    USART_SendStr_Blocking(sTmp);
+    UpdateLCD();
     
+    #ifdef UART_SEND_TEMP
+      sprintf(sTmp, "%2.1f\r\n", fTempr);
+      USART_SendStr_Blocking(sTmp);
+    #endif
+
+/*    
     // show period
     if (bPeriodUpdate)
     {
@@ -775,93 +1410,67 @@ int main(void)
       //LCD_DisplayStringLine(0, sTmp);
       bPeriodUpdate = 0; 
     }
+*/
     
     // wait for end delay and check push buttons
     iTimerDelayPrev = TimingDelay;
     while (TimingDelay != 0)
     {
       Btns_Check();
+      if (bUpdateLCD)
+      {
+        UpdateLCD();
+        bUpdateLCD = 0;
+        
+        if (bStoreParams) 
+        {
+          Flash_StoreParameters(); bStoreParams = 0;
+        }
+      }
       
       while (TimingDelay == iTimerDelayPrev) ; // 1ms wait here
       iTimerDelayPrev = TimingDelay;
       
-      if (BTN_USER_PRESSED)
-      {
-        if (bTuningMode == 0)
-        {
-          // activate auto-tuning mode
-          bTuningMode = 1;
-          // full turn-on of heater
-          iTriacDuty = MAX_TRIAC_DUTY;
-          Timer_LoadCompare(iPeriod - (iPeriod*iTriacDuty / MAX_TRIAC_DUTY));
-          // prepare for auto-tuning
-          iPeriodCycle = 0;
-          Tuning_Start(fTempr);
-          
-          sprintf(sTmp, "tuning..");
-          LCD_DisplayStringLine(0, sTmp);
-        }
-        else
-        {
-          // finilizing auto-tuning
-          sprintf(sTmp, "wait...");
-          LCD_DisplayStringLine(0, sTmp);
-          
-          if (Tuning_Finilize(fTempr) == TUNING_RESULT_OK)
-          {
-            sprintf(sTmp, "ok!  ");
-            LCD_DisplayStringLine(0, sTmp);
-            
-            fE = Tuning_CalculateMaxError();
-            sprintf(sTmp, "err %2.1f %%", fE);
-            LCD_DisplayStringLine(0, sTmp);
-          }
-          else
-          {
-            sprintf(sTmp, "failed:(");
-            LCD_DisplayStringLine(0, sTmp);
-          }
-          
-          bTuningMode = 0;
-        }
-      }
     }
     
     // wait for some time for full cycle
     TimingDelay = END_PAUSE_DURATION;
     
     ds_strong_pull_up(0);
-    ds_read_data_single(bData);
-    iRes = ds_conv_to_temperature(bData);
-    fTempr = iRes / 10.0;
+    if (ds_read_data_single(bData) == 0)
+    {
+      iRes = ds_conv_to_temperature(bData);
+      fTempr = iRes / 10.0;
+    
+      fTempr = fSensK*fTempr + fSensO; // correction with gain and offset
+      iError_TempCount = 0;
+    }
+    else
+    {
+      iError_TempCount++;
+      if (iError_TempCount >= TEMP_ERROR_COUNT)
+        Beep_On();
+    }
     
     while (TimingDelay != 0)
     {
-      // btn handling here
+      Btns_Check();
+      if (bUpdateLCD)
+      {
+        UpdateLCD();
+        bUpdateLCD = 0;
+        
+        if (bStoreParams) 
+        {
+          Flash_StoreParameters(); bStoreParams = 0;
+        }
+      }
     }
+    
+    IWDG_ReloadCounter();
     
   }
   
-  
-  while(1)
-  {  
-    Btns_Check();
-		
-    Delay(10);
-
-    if (BTN_USER_PRESSED)
-    {
-      //LCD_DisplayStringLine(1, "It's me");
-      bBtnPressed50HzOut = 1;
-    }
-    
-    if (bPeriodUpdate)
-    {
-      sprintf(sTmp, "%d", iPeriod);
-      LCD_DisplayStringLine(0, sTmp);
-      bPeriodUpdate = 0;
-    }
-  }
 }
 
 /**
@@ -886,6 +1495,30 @@ void TimingDelay_Decrement(void)
   if (TimingDelay != 0x00)
   { 
     TimingDelay--;
+  }
+  
+  #ifdef SOFTWARE_BEEP
+    if (bBeep)
+      Beep_Toggle();
+  #endif
+    
+  if (bBlinkEn)
+  {
+    iSecTimer++;
+    if (iSecTimer == 250)
+    {
+      iSecTimer = 0;
+      
+      bBlinkLCD = !bBlinkLCD;
+      bUpdateLCD = 1;
+    }
+  }
+  
+  iSecRotation++;
+  if (iSecRotation == 1000)
+  {
+    iSecRotation = 0;
+    Rotate_Check();
   }
 }
 

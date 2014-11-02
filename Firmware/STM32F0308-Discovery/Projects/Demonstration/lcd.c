@@ -165,29 +165,29 @@ void LCD_DisplayStringLine(char Line, char *ptr)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-  #define LCD_RS_GPIO_PORT          GPIOB
-  #define LCD_RS_GPIO_CLK           RCC_AHBPeriph_GPIOB   
-  #define LCD_RS_GPIO_PIN           GPIO_Pin_8
+  #define LCD_RS_GPIO_PORT          GPIOA
+  #define LCD_RS_GPIO_CLK           RCC_AHBPeriph_GPIOA   
+  #define LCD_RS_GPIO_PIN           GPIO_Pin_0
 
-  #define LCD_E_GPIO_PORT           GPIOB
-  #define LCD_E_GPIO_CLK            RCC_AHBPeriph_GPIOB    
-  #define LCD_E_GPIO_PIN            GPIO_Pin_9
+  #define LCD_E_GPIO_PORT           GPIOA
+  #define LCD_E_GPIO_CLK            RCC_AHBPeriph_GPIOA    
+  #define LCD_E_GPIO_PIN            GPIO_Pin_1
 
-  #define LCD_D4_GPIO_PORT          GPIOB
-  #define LCD_D4_GPIO_CLK           RCC_AHBPeriph_GPIOB    
-  #define LCD_D4_GPIO_PIN           GPIO_Pin_4
+  #define LCD_D4_GPIO_PORT          GPIOA
+  #define LCD_D4_GPIO_CLK           RCC_AHBPeriph_GPIOA    
+  #define LCD_D4_GPIO_PIN           GPIO_Pin_2
 
-  #define LCD_D5_GPIO_PORT          GPIOB
-  #define LCD_D5_GPIO_CLK           RCC_AHBPeriph_GPIOB    
-  #define LCD_D5_GPIO_PIN           GPIO_Pin_5
+  #define LCD_D5_GPIO_PORT          GPIOA
+  #define LCD_D5_GPIO_CLK           RCC_AHBPeriph_GPIOA    
+  #define LCD_D5_GPIO_PIN           GPIO_Pin_3
 
-  #define LCD_D6_GPIO_PORT          GPIOB
-  #define LCD_D6_GPIO_CLK           RCC_AHBPeriph_GPIOB   
-  #define LCD_D6_GPIO_PIN           GPIO_Pin_6
+  #define LCD_D6_GPIO_PORT          GPIOA
+  #define LCD_D6_GPIO_CLK           RCC_AHBPeriph_GPIOA   
+  #define LCD_D6_GPIO_PIN           GPIO_Pin_4
 
-  #define LCD_D7_GPIO_PORT          GPIOB
-  #define LCD_D7_GPIO_CLK           RCC_AHBPeriph_GPIOB  
-  #define LCD_D7_GPIO_PIN           GPIO_Pin_7
+  #define LCD_D7_GPIO_PORT          GPIOA
+  #define LCD_D7_GPIO_CLK           RCC_AHBPeriph_GPIOA  
+  #define LCD_D7_GPIO_PIN           GPIO_Pin_5
 
 void LCD_CtrlLinesConfig(void)
 {
@@ -221,6 +221,20 @@ void LCD_CtrlLinesConfig(void)
   RCC_AHBPeriphClockCmd(LCD_D7_GPIO_CLK, ENABLE);
   GPIO_InitStructure.GPIO_Pin = LCD_D7_GPIO_PIN;
   GPIO_Init(LCD_D7_GPIO_PORT, &GPIO_InitStructure);
+/*
+GPIO_SetBits(LCD_RS_GPIO_PORT, LCD_RS_GPIO_PIN);
+GPIO_ResetBits(LCD_RS_GPIO_PORT, LCD_RS_GPIO_PIN);
+GPIO_SetBits(LCD_E_GPIO_PORT, LCD_E_GPIO_PIN);
+GPIO_ResetBits(LCD_E_GPIO_PORT, LCD_E_GPIO_PIN);
+GPIO_SetBits(LCD_D4_GPIO_PORT, LCD_D4_GPIO_PIN);
+GPIO_ResetBits(LCD_D4_GPIO_PORT, LCD_D4_GPIO_PIN);
+GPIO_SetBits(LCD_D5_GPIO_PORT, LCD_D5_GPIO_PIN);
+GPIO_ResetBits(LCD_D5_GPIO_PORT, LCD_D5_GPIO_PIN);
+GPIO_SetBits(LCD_D6_GPIO_PORT, LCD_D6_GPIO_PIN);
+GPIO_ResetBits(LCD_D6_GPIO_PORT, LCD_D6_GPIO_PIN);
+GPIO_SetBits(LCD_D7_GPIO_PORT, LCD_D7_GPIO_PIN);
+GPIO_ResetBits(LCD_D7_GPIO_PORT, LCD_D7_GPIO_PIN);
+*/
 }
 
 

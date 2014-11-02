@@ -11,9 +11,9 @@
 #define TIMER_CLK   RCC_APB1Periph_TIM3
 
 // 1-wire pin   
-#define PORT        GPIOC
-#define PIN         GPIO_Pin_13
-#define PORT_CLK    RCC_AHBPeriph_GPIOC
+#define PORT        GPIOA
+#define PIN         GPIO_Pin_7
+#define PORT_CLK    RCC_AHBPeriph_GPIOA
 
 //*********************************************************************************************
 // Timer
